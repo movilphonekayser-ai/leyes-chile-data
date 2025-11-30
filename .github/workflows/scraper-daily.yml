@@ -26,7 +26,7 @@ jobs:
     - name: Ejecutar scrapers
       run: |
         cd scrapers
-        python diputados_basico.py
+        python diputados_basico.py || exit 1  # Falla visiblemente si hay error
         # Agregar más scrapers después
         
     - name: Subir cambios a repo
