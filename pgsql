@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "nombre": "Ley de Prueba desde GitHub",
+    "fecha": "2025-03-10",
+    "objetivo": "Esta es una ley de prueba cargada desde GitHub.",
+    "impacto": "Permite verificar que la carga funciona.",
+    "autores": [
+      { "nombre": "Juan Pérez", "partido": "Independiente" }
+    ],
+    "sector": "Pruebas"
+  }
+]
