@@ -27,7 +27,11 @@ jobs:
       run: |
         cd scrapers
         python diputados_basico.py || exit 1  # Falla visiblemente si hay error
-        # Agregar más scrapers después
+
+    - name: Verificar que se crearon archivos
+      run: |
+        ls -la data/ || exit 1
+        test -f data/diputados.json || exit 1
         
     - name: Subir cambios a repo
       run: |
