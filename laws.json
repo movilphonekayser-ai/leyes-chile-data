@@ -10,25 +10,25 @@
     ],
     "sector": "Pruebas"
   }
-  [
+  
   {
-    "id": 1,
+    "id": 2,
     "titulo": "Ley de Prueba",
     "descripcion": "Esta es una ley de prueba",
     "categoria": "General"
   },
   {
-    "id": 2,
+    "id": 3,
     "titulo": "Ley Nacional N° 1234",
     "descripcion": "Descripción de la ley 1234",
     "categoria": "Seguridad"
   },
   {
-    "id": 3,
+    "id": 4,
     "titulo": "Reforma 2025",
     "descripcion": "Una reforma reciente",
     "categoria": "Actualidad"
   }
 ]
 
-]
+
