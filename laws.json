@@ -93,7 +93,33 @@
   "fecha": "2024-12-10",
   "objetivo": "Incorporar programación básica desde 5° básico.",
   "impacto": "Capacitación a más de 9.000 docentes.
-
+"autores": [
+    { "nombre": "Tomás Valdivia", "partido": "Progresista" }
+  ],
+  "sector": "Educación"
+},
+{
+  "id": 10,
+  "nombre": "Ley de Regulación de Inteligencia Artificial",
+  "fecha": "2025-03-05",
+  "objetivo": "Definir límites éticos para el uso de IA.",
+  "impacto": "Sector público debe validar modelos antes de usarlos.",
+  "autores": [
+    { "nombre": "Andrés Fuentes", "partido": "Tecnócrata" }
+  ],
+  "sector": "Tecnología"
+},
+{
+  "id": 11,
+  "nombre": "Ley de Fortalecimiento Policial",
+  "fecha": "2025-02-20",
+  "objetivo": "Aumentar recursos para capacitación y equipamiento.",
+  "impacto": "1500 nuevos dispositivos de registro corporal.",
+  "autores": [
+    { "nombre": "Patricia Molina", "partido": "Conservador" }
+  ],
+  "sector": "Seguridad"
+}
 ]
 
 
