@@ -1,0 +1,38 @@
+name: Scraper Diario Parlamentario
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Ejecutar diario a las 8 AM UTC
+  workflow_dispatch:      # Permite ejecución manual
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Instalar dependencias
+      run: |
+        cd scrapers
+        pip install -r requirements.txt
+        
+    - name: Ejecutar scrapers
+      run: |
+        cd scrapers
+        python diputados_basico.py
+        # Agregar más scrapers después
+        
+    - name: Subir cambios a repo
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git commit -m "📊 Actualización automática de datos parlamentarios" || exit 0
+        git push
