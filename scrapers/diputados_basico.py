@@ -1,48 +1,37 @@
 import os
-
-def scrapear_diputados_basico():
-    """Scraper mejorado para información real de diputados"""
-    # CREAR CARPETA DATA SI NO EXISTE
-    os.makedirs('../data', exist_ok=True)
-    
-    print("🔄 Iniciando scraper de diputados...")
-    # ... resto del código
 import requests
 from bs4 import BeautifulSoup
 import json
-import time
 from datetime import datetime
 
 def scrapear_diputados_basico():
     """Scraper mejorado para información real de diputados"""
+    
+    # 1. PRIMERO: Crear ruta absoluta para la carpeta data
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(current_dir, '..', 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    
+    print(f"📁 Carpeta data creada/verificada: {data_dir}")
     print("🔄 Iniciando scraper de diputados...")
     
-    # URL principal de diputados
+    # 2. URL principal de diputados
     url = "https://www.camara.cl/diputados/diputados.aspx"
     
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
         
+        print(f"🌐 Conectando a: {url}")
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
-        diputados = []
         
-        print("🔍 Buscando lista de diputados...")
+        print("🔍 Analizando contenido de la página...")
         
-        # Buscar la sección de diputados - estructura aproximada
-        # Esto necesitará ajustes basados en la estructura real del sitio
-        diputados_container = soup.find('div', class_='lista-diputados') or soup.find('table', class_='tabla-diputados')
-        
-        if not diputados_container:
-            # Si no encontramos la estructura específica, buscar elementos comunes
-            diputados_links = soup.find_all('a', href=lambda x: x and 'detalle' in x) if soup else []
-            print(f"📝 Encontrados {len(diputados_links)} enlaces potenciales de diputados")
-        
-        # DATOS DE EJEMPLO MEJORADOS (para prueba de estructura)
+        # 3. DATOS DE EJEMPLO (para estructura inicial)
         diputados_ejemplo = [
             {
                 "id": 1019,
@@ -116,18 +105,22 @@ def scrapear_diputados_basico():
             }
         ]
         
-        # Guardar datos en JSON
-        with open('../data/diputados.json', 'w', encoding='utf-8') as f:
-            json.dump(diputados_ejemplo, f, ensure_ascii=False, indent=2)
-            
-        # También guardar en CSV para análisis
-        with open('../data/diputados.json', 'w', encoding='utf-8') as f:
+        # 4. Ruta completa para el archivo JSON
+        json_path = os.path.join(data_dir, 'diputados.json')
+        
+        # 5. Guardar datos en JSON
+        with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(diputados_ejemplo, f, ensure_ascii=False, indent=2)
         
         print(f"✅ Datos de {len(diputados_ejemplo)} diputados guardados exitosamente")
-        print("📊 Archivos creados:")
-        print("   - data/diputados.json")
-        print("   - data/diputados.csv")
+        print(f"📊 Archivo creado: {json_path}")
+        
+        # 6. Verificar que el archivo existe
+        if os.path.exists(json_path):
+            file_size = os.path.getsize(json_path)
+            print(f"📏 Tamaño del archivo: {file_size} bytes")
+        else:
+            print("⚠️  Archivo no encontrado después de guardar")
         
         return diputados_ejemplo
         
@@ -135,22 +128,31 @@ def scrapear_diputados_basico():
         print(f"❌ Error de conexión: {e}")
         return []
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        print(f"❌ Error inesperado: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return []
 
 def test_scraper():
     """Función de prueba del scraper"""
-    print("🧪 Ejecutando prueba del scraper...")
+    print("=" * 50)
+    print("🧪 EJECUTANDO PRUEBA DEL SCRAPER")
+    print("=" * 50)
+    
     resultados = scrapear_diputados_basico()
     
     if resultados:
-        print(f"🎉 Prueba exitosa. Se procesaron {len(resultados)} diputados")
-        print("📋 Primer diputado procesado:")
+        print(f"\n🎉 PRUEBA EXITOSA")
+        print(f"📊 Total de diputados procesados: {len(resultados)}")
+        print("\n📋 MUESTRA DEL PRIMER DIPUTADO:")
         print(f"   Nombre: {resultados[0]['nombre']}")
         print(f"   Partido: {resultados[0]['partido']}") 
         print(f"   Distrito: {resultados[0]['distrito']}")
+        print(f"   Comisiones: {', '.join(resultados[0]['comisiones'])}")
     else:
-        print("💥 Prueba fallida")
+        print("\n💥 PRUEBA FALLIDA - No se obtuvieron datos")
+    
+    print("=" * 50)
 
 if __name__ == "__main__":
     test_scraper()
