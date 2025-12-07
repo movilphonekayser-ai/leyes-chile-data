@@ -19,7 +19,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'scripts/**'
+      - 'scrapers/**'
       - '.github/workflows/**'
 
 jobs:
