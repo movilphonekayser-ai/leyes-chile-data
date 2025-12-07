@@ -414,7 +414,32 @@ async def main():
         return 1
     
     return 0
+# Agregar al final del archivo, antes del if __name__...
+async def test_listado():
+    """Prueba rápida solo para obtener listado"""
+    scraper = ScraperDiputadosReales()
+    
+    connector = aiohttp.TCPConnector(ssl=False)
+    async with aiohttp.ClientSession(connector=connector) as session:
+        scraper.session = session
+        diputados = await scraper.obtener_listado_diputados()
+        
+        if diputados:
+            print(f"✅ Encontrados {len(diputados)} diputados:")
+            for dip in diputados[:10]:  # Mostrar primeros 10
+                print(f"  {dip['id']}: {dip['nombre']}")
+        else:
+            print("❌ No se encontraron diputados")
+            # Guardar HTML para debug
+            html = await scraper.fetch(scraper.LISTADO_URL)
+            with open("debug_page.html", "w", encoding="utf-8") as f:
+                f.write(html)
+            print("📁 HTML guardado en debug_page.html")
 
+# Cambiar main() temporalmente para solo probar
+async def main():
+    await test_listado()
+    
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
     exit(exit_code)
