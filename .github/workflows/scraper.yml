@@ -49,7 +49,7 @@ jobs:
       id: scraper
       run: |
         echo "🧹 Limpiando caché..."
-        cd scripts
+        cd scrapers
         echo "🚀 Iniciando scraping..."
         python scraper.py
         
