@@ -1,3 +1,12 @@
+import os
+
+def scrapear_diputados_basico():
+    """Scraper mejorado para información real de diputados"""
+    # CREAR CARPETA DATA SI NO EXISTE
+    os.makedirs('../data', exist_ok=True)
+    
+    print("🔄 Iniciando scraper de diputados...")
+    # ... resto del código
 import requests
 from bs4 import BeautifulSoup
 import json
