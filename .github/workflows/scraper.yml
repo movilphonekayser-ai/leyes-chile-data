@@ -104,7 +104,7 @@ jobs:
         git push origin main
     
     - name: 📤 Subir artefacto (backup)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: datos-parlamentarios-${{ github.run_id }}
         path: data/diputados.json
