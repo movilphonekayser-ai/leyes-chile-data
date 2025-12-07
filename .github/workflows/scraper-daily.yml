@@ -47,3 +47,17 @@ jobs:
         git add data/
         git commit -m "📊 Actualización automática de datos parlamentarios $(date '+%Y-%m-%d %H:%M')" || exit 0
         git push
+    - name: Subir datos a AeonFree via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./data/
+        server-dir: /web/data/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.env
+        dangerous-clean-slate: false
