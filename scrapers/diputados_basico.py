@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-import pandas as pd
 import time
 from datetime import datetime
 
@@ -113,8 +112,8 @@ def scrapear_diputados_basico():
             json.dump(diputados_ejemplo, f, ensure_ascii=False, indent=2)
             
         # También guardar en CSV para análisis
-        df = pd.DataFrame(diputados_ejemplo)
-        df.to_csv('../data/diputados.csv', index=False, encoding='utf-8')
+        with open('../data/diputados.json', 'w', encoding='utf-8') as f:
+            json.dump(diputados_ejemplo, f, ensure_ascii=False, indent=2)
         
         print(f"✅ Datos de {len(diputados_ejemplo)} diputados guardados exitosamente")
         print("📊 Archivos creados:")
