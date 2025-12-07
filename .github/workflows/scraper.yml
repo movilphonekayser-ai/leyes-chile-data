@@ -1,0 +1,142 @@
+name: 🕸️ Scraper Parlamentario
+
+on:
+  schedule:
+    # Ejecutar a las 08:00 y 20:00 UTC (05:00 y 17:00 Chile continental)
+    - cron: '0 8 * * *'
+    - cron: '0 20 * * *'
+  
+  # Ejecución manual desde GitHub UI
+  workflow_dispatch:
+    inputs:
+      force_run:
+        description: 'Forzar ejecución completa'
+        required: false
+        default: 'false'
+        type: boolean
+  
+  # Ejecutar cuando cambien los scripts
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/**'
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: ⬇️ Checkout del repositorio
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🐍 Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: 📦 Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install aiohttp beautifulsoup4 lxml
+    
+    - name: 🕸️ Ejecutar scraper
+      id: scraper
+      run: |
+        echo "🧹 Limpiando caché..."
+        cd scripts
+        echo "🚀 Iniciando scraping..."
+        python scraper.py
+        
+        # Verificar si se generó el archivo
+        if [ -f "../data/diputados.json" ]; then
+          echo "✅ Scraper completado exitosamente"
+          echo "diputados_count=$(jq '.total_diputados' ../data/diputados.json)" >> $GITHUB_OUTPUT
+          echo "file_size=$(stat -c%s ../data/diputados.json)" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Error: No se generó diputados.json"
+          exit 1
+        fi
+    
+    - name: 📊 Verificar cambios
+      id: check_changes
+      run: |
+        git status
+        if git diff --quiet data/diputados.json; then
+          echo "📭 No hay cambios en los datos"
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "📬 Hay cambios en los datos"
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          
+          # Mostrar resumen de cambios
+          echo "📋 Resumen de cambios:"
+          git diff --stat data/diputados.json
+        fi
+    
+    - name: 💾 Commit y push de datos actualizados
+      if: steps.check_changes.outputs.has_changes == 'true'
+      run: |
+        # Configurar git
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        
+        # Agregar y commit
+        git add data/diputados.json
+        git add data/diputados_min.json 2>/dev/null || true
+        
+        # Mensaje informativo
+        DIPUTADOS_COUNT=$(jq '.total_diputados' data/diputados.json)
+        FECHA=$(date +'%Y-%m-%d %H:%M')
+        
+        git commit -m "🤖 Actualización automática ($FECHA)
+
+        📊 $DIPUTADOS_COUNT diputados actualizados
+        🔄 Workflow: ${{ github.workflow }}
+        🏃 Ejecución: ${{ github.run_id }}"
+        
+        # Push
+        git push origin main
+    
+    - name: 📤 Subir artefacto (backup)
+      uses: actions/upload-artifact@v3
+      with:
+        name: datos-parlamentarios-${{ github.run_id }}
+        path: data/diputados.json
+        retention-days: 7
+    
+    - name: 📝 Generar reporte
+      if: always()
+      run: |
+        echo "📋 REPORTE DE EJECUCIÓN" > report.md
+        echo "======================" >> report.md
+        echo "" >> report.md
+        echo "**Fecha:** $(date)" >> report.md
+        echo "**Workflow:** ${{ github.workflow }}" >> report.md
+        echo "**Run ID:** ${{ github.run_id }}" >> report.md
+        echo "" >> report.md
+        
+        if [ -f "data/diputados.json" ]; then
+          echo "**Estado:** ✅ Éxito" >> report.md
+          echo "**Diputados procesados:** $(jq '.total_diputados' data/diputados.json)" >> report.md
+          echo "**Última actualización:** $(jq -r '.fecha_generacion' data/diputados.json)" >> report.md
+        else
+          echo "**Estado:** ❌ Fallo" >> report.md
+        fi
+        
+        cat report.md
+    
+    - name: 🚨 Notificar fallo (opcional)
+      if: failure()
+      run: |
+        echo "❌ El scraper falló en la ejecución ${{ github.run_id }}"
+        echo "Revisar logs en: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+# Permisos necesarios
+permissions:
+  contents: write
